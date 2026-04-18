@@ -1,0 +1,485 @@
+import React, { useMemo, useState } from 'react'
+import {
+  Shield,
+  Gavel,
+  Users,
+  Siren,
+  Wallet,
+  MessageSquare,
+  Search,
+  ScrollText,
+  BadgeAlert,
+  Car,
+  HeartPulse,
+  Building2,
+  MapPinned,
+  ChevronRight,
+  ExternalLink,
+} from 'lucide-react'
+
+const sections = [
+  {
+    id: 'visao-geral',
+    title: 'Visão geral',
+    icon: ScrollText,
+    accent: 'Leitura obrigatória',
+    items: [
+      {
+        title: 'Objetivo da cidade',
+        text: 'A Igrejinha RP é uma cidade focada em imersão, respeito, bom senso e interpretação de personagem. Toda ação deve priorizar a experiência coletiva e a coerência do roleplay.',
+      },
+      {
+        title: 'Regra de ouro',
+        text: 'Use sempre o bom senso. Situações não previstas aqui poderão ser analisadas pela staff com base em coerência, intenção e impacto no servidor.',
+      },
+      {
+        title: 'Respeito acima de tudo',
+        text: 'É proibido qualquer ato de preconceito, discriminação, assédio, humilhação, perseguição, toxicidade excessiva ou comportamento que prejudique a convivência da comunidade.',
+      },
+      {
+        title: 'Idade e maturidade',
+        text: 'Todos os jogadores devem agir com maturidade dentro e fora do personagem, respeitando a staff, os membros de facções, da polícia, do hospital e os demais participantes.',
+      },
+    ],
+  },
+  {
+    id: 'regras-gerais',
+    title: 'Regras gerais',
+    icon: Shield,
+    accent: 'Base da convivência',
+    items: [
+      {
+        title: 'Valorize sua vida (Fear RP)',
+        text: 'Seu personagem deve agir como alguém que teme morrer, ser ferido, sequestrado ou perder bens. Reações irreais diante de ameaça grave poderão ser punidas.',
+      },
+      {
+        title: 'Meta gaming',
+        text: 'Usar informações de fora do jogo dentro do jogo é proibido. Exemplos: live, Discord, chamada, chat externo ou informações obtidas como espectador.',
+      },
+      {
+        title: 'Power gaming',
+        text: 'Forçar ações irreais, impossíveis ou sem chance de reação ao outro jogador é proibido. Toda ação deve dar espaço para interpretação e resposta.',
+      },
+      {
+        title: 'Combat logging',
+        text: 'Deslogar, cair intencionalmente ou sair do servidor para evitar abordagem, prisão, morte, sequestro ou perda de itens é proibido.',
+      },
+      {
+        title: 'Anti-RP',
+        text: 'Qualquer conduta que quebre a lógica do personagem ou estrague a cena de RP, como zoeira em momento sério, falta de reação ou tumulto proposital, será considerada Anti-RP.',
+      },
+      {
+        title: 'Noção de continuidade',
+        text: 'Toda cena tem consequência. Evite agir como se nada tivesse acontecido após perseguições, acidentes, trocas de tiro, abordagens médicas ou conflitos marcantes.',
+      },
+    ],
+  },
+  {
+    id: 'conduta-comunicacao',
+    title: 'Conduta e comunicação',
+    icon: MessageSquare,
+    accent: 'Chat, voz e postura',
+    items: [
+      {
+        title: 'Chat OOC',
+        text: 'Assuntos fora do personagem devem ser tratados apenas quando necessário e com respeito. Discussões administrativas devem ir para ticket, nunca para o calor da cena.',
+      },
+      {
+        title: 'Voice chat limpo',
+        text: 'Evite gritaria desnecessária, spam de microfone, sons altos, música para atrapalhar outros jogadores ou qualquer forma de poluição sonora proposital.',
+      },
+      {
+        title: 'Proibido forçar amizade OOC',
+        text: 'Relações dentro do jogo devem nascer do RP. Não use amizade de fora para obter vantagem dentro da cidade.',
+      },
+      {
+        title: 'Streams e gravações',
+        text: 'É permitido gravar e fazer live, mas sem expor informações privilegiadas, humilhar jogadores, incentivar hate ou usar o conteúdo para metagaming.',
+      },
+    ],
+  },
+  {
+    id: 'crimes-acoes',
+    title: 'Crimes e ações ilegais',
+    icon: BadgeAlert,
+    accent: 'Ações com risco e regra',
+    items: [
+      {
+        title: 'RDM',
+        text: 'Matar ou agredir sem motivo plausível, sem desenvolvimento mínimo de cena ou sem contexto de RP é proibido. Todo confronto deve ter construção.',
+      },
+      {
+        title: 'VDM',
+        text: 'Usar veículo como arma sem contexto extremo e coerente é proibido. Atropelar por diversão, fuga sem lógica ou matar intencionalmente com carro gera punição.',
+      },
+      {
+        title: 'Assaltos',
+        text: 'Assaltos devem ter voz de abordagem, ameaça compreensível e tempo de reação compatível. Não é permitido assaltar apenas para humilhar ou travar a experiência do outro.',
+      },
+      {
+        title: 'Sequestros',
+        text: 'Sequestros precisam de motivo de RP, condução séria e negociação coerente. O objetivo deve ser desenvolvimento de história, lucro plausível ou resolução de conflito.',
+      },
+      {
+        title: 'Tortura e exageros',
+        text: 'É proibido descrever cenas pesadas, grotescas ou abusivas. O foco deve ser interpretação séria sem conteúdo gráfico ou humilhação extrema.',
+      },
+      {
+        title: 'Roubo sem contexto',
+        text: 'Não use crimes como ferramenta de farm ou para gerar caos aleatório. A staff poderá barrar padrões repetitivos e sem construção narrativa.',
+      },
+    ],
+  },
+  {
+    id: 'zonas-seguras',
+    title: 'Zonas seguras e locais públicos',
+    icon: MapPinned,
+    accent: 'Onde o caos não entra',
+    items: [
+      {
+        title: 'Safe zones',
+        text: 'Hospital, delegacia, prefeitura, áreas de spawn e demais locais definidos pela staff são zonas de proteção. Nessas áreas, crimes e provocações podem ser proibidos ou limitados.',
+      },
+      {
+        title: 'Respeito em locais públicos',
+        text: 'Evite iniciar ações sem contexto em lugares movimentados só para gerar confusão. A densidade do ambiente deve ser considerada no seu RP.',
+      },
+      {
+        title: 'Fuga para safe zone',
+        text: 'Entrar em zona segura apenas para escapar de ação já iniciada poderá ser considerado abuso de regra.',
+      },
+    ],
+  },
+  {
+    id: 'veiculos-transito',
+    title: 'Veículos e trânsito',
+    icon: Car,
+    accent: 'Direção com coerência',
+    items: [
+      {
+        title: 'Dirigir com noção',
+        text: 'Você pode correr riscos no RP, mas não dirigir de forma totalmente arcade e sem consequência o tempo todo. Colisões e capotamentos relevantes exigem reação compatível.',
+      },
+      {
+        title: 'Veículos destruídos',
+        text: 'Caso o veículo esteja muito danificado, pegando fogo, sem controle ou claramente inutilizado, é esperado que o personagem reaja e não continue como se nada tivesse acontecido.',
+      },
+      {
+        title: 'Pit, fechadas e perseguições',
+        text: 'Manobras agressivas devem seguir a lógica do servidor e não podem ser usadas de forma abusiva, principalmente quando o objetivo for apenas encerrar a cena sem RP.',
+      },
+    ],
+  },
+  {
+    id: 'policia-legalidade',
+    title: 'Polícia, legalidade e abordagem',
+    icon: Siren,
+    accent: 'Equilíbrio entre ação e RP',
+    items: [
+      {
+        title: 'Abordagens policiais',
+        text: 'Toda abordagem deve ter comunicação clara, motivo plausível e respeito à progressão da cena. A polícia deve prezar pelo RP, não apenas pelo resultado.',
+      },
+      {
+        title: 'Reação do civil',
+        text: 'O civil pode fugir, blefar, mentir ou cooperar, mas deve respeitar Fear RP, coerência e a situação apresentada.',
+      },
+      {
+        title: 'Corrupção e abuso',
+        text: 'Qualquer sistema interno envolvendo corrupção, grupos especiais ou operações diferenciadas deve seguir autorização da staff. Abuso de função é proibido.',
+      },
+      {
+        title: 'Prisão e processo',
+        text: 'Prisões, revistas, apreensões e multas devem ocorrer com base em RP e sistema. Discussões sobre erro administrativo devem ser levadas à staff depois da cena.',
+      },
+    ],
+  },
+  {
+    id: 'hospital-saude',
+    title: 'Hospital e saúde',
+    icon: HeartPulse,
+    accent: 'Valorização da vida',
+    items: [
+      {
+        title: 'Atendimento médico',
+        text: 'Ferimentos relevantes, quedas sérias, acidentes fortes e trocas de tiro exigem atendimento médico ou reação compatível, conforme a gravidade.',
+      },
+      {
+        title: 'Desmaios e reanimação',
+        text: 'Após atendimento, siga a orientação da equipe médica e respeite limitações temporárias caso a cena exija.',
+      },
+      {
+        title: 'Memória da cena',
+        text: 'A staff poderá definir regras de lembrança ou esquecimento parcial após situações extremas, conforme a proposta do servidor.',
+      },
+    ],
+  },
+  {
+    id: 'economia-itens',
+    title: 'Economia, itens e patrimônio',
+    icon: Wallet,
+    accent: 'Nada de abuso',
+    items: [
+      {
+        title: 'Exploit e duplicação',
+        text: 'É proibido usar bugs, falhas, glitches, duplicação ou qualquer vantagem indevida para obter dinheiro, item, arma, veículo ou status.',
+      },
+      {
+        title: 'Transferências suspeitas',
+        text: 'Envios de grande valor sem contexto, laranjas, contas auxiliares e movimentações irregulares poderão ser investigados pela staff.',
+      },
+      {
+        title: 'Comércio coerente',
+        text: 'Negociações devem ter lógica com a economia da cidade. Preços abusivos, combinações OOC e lavagem sem RP podem ser punidos.',
+      },
+    ],
+  },
+  {
+    id: 'faccoes-orgs',
+    title: 'Facções, organizações e grupos',
+    icon: Users,
+    accent: 'Hierarquia com responsabilidade',
+    items: [
+      {
+        title: 'Organização oficial',
+        text: 'Toda facção, empresa, gangue, família ou grupo estruturado deve seguir as regras internas do servidor e respeitar limites definidos pela staff.',
+      },
+      {
+        title: 'Guerras e rivalidades',
+        text: 'Conflitos entre grupos precisam de motivo, progressão e supervisão quando necessário. Não transforme rivalidade em tiroteio aleatório sem construção.',
+      },
+      {
+        title: 'Uso de uniforme, base e território',
+        text: 'O domínio de áreas, pontos de venda e sedes deve respeitar a configuração da cidade. Reivindicações sem autorização administrativa não têm validade automática.',
+      },
+    ],
+  },
+  {
+    id: 'staff-denuncias',
+    title: 'Staff, denúncias e punições',
+    icon: Gavel,
+    accent: 'Fiscalização e ordem',
+    items: [
+      {
+        title: 'Respeito à staff',
+        text: 'A decisão da staff durante contenção de conflito deve ser respeitada. Caso discorde, utilize ticket com calma e provas.',
+      },
+      {
+        title: 'Denúncias',
+        text: 'Toda denúncia deve conter provas quando possível: vídeo, print, horário e explicação objetiva. Acusações sem base ou por vingança poderão gerar punição.',
+      },
+      {
+        title: 'Escalonamento de punições',
+        text: 'As punições podem variar entre advertência verbal, advertência formal, jail administrativa, suspensão temporária e banimento permanente, conforme gravidade e reincidência.',
+      },
+      {
+        title: 'Punição por intenção',
+        text: 'A staff poderá considerar não apenas o resultado da ação, mas a intenção do jogador, reincidência, impacto na comunidade e postura no atendimento.',
+      },
+    ],
+  },
+]
+
+const highlights = [
+  'Sem racismo, preconceito ou toxicidade',
+  'Sem metagaming, powergaming ou combat logging',
+  'Valorize a vida do seu personagem',
+  'Assaltos e sequestros só com contexto',
+  'Respeite polícia, hospital e staff',
+  'Use bom senso sempre',
+]
+
+export default function App() {
+  const [query, setQuery] = useState('')
+
+  const filteredSections = useMemo(() => {
+    const q = query.trim().toLowerCase()
+    if (!q) return sections
+
+    return sections
+      .map((section) => ({
+        ...section,
+        items: section.items.filter(
+          (item) =>
+            section.title.toLowerCase().includes(q) ||
+            item.title.toLowerCase().includes(q) ||
+            item.text.toLowerCase().includes(q)
+        ),
+      }))
+      .filter((section) => section.items.length > 0 || section.title.toLowerCase().includes(q))
+  }, [query])
+
+  return (
+    <div className="page-shell">
+      <header className="hero">
+        <div className="hero-backdrop" />
+        <div className="hero-overlay" />
+
+        <div className="container hero-content hero-grid">
+          <div className="hero-copy">
+            <span className="hero-badge">Cidade RP • FiveM • GTA V</span>
+            <h1>
+              Regras Oficiais da <span>Igrejinha RP</span>
+            </h1>
+            <p>
+              Uma cidade feita para quem curte RP sério, organizado e imersivo. Leia as regras com
+              atenção antes de entrar para garantir uma experiência limpa, justa e marcante dentro da
+              Igrejinha.
+            </p>
+
+            <div className="hero-actions">
+              <a href="#regras" className="btn btn-primary">
+                Ler regras completas
+              </a>
+              <a
+                href="https://discord.gg/D9M4yTdu"
+                target="_blank"
+                rel="noreferrer"
+                className="btn btn-secondary"
+              >
+                Entrar no Discord <ExternalLink size={16} />
+              </a>
+            </div>
+
+            <div className="hero-points">
+              <div className="hero-point">
+                <strong>RP com respeito</strong>
+                <span>Sem toxicidade, sem preconceito e sem Anti-RP.</span>
+              </div>
+              <div className="hero-point">
+                <strong>Ações com contexto</strong>
+                <span>Assaltos, sequestros e conflitos precisam de construção.</span>
+              </div>
+              <div className="hero-point">
+                <strong>Comunidade ativa</strong>
+                <span>Discord oficial para avisos, suporte e acompanhamento da cidade.</span>
+              </div>
+            </div>
+          </div>
+
+          <div className="hero-visual">
+            <div className="hero-logo-card">
+              <div className="hero-logo-wrap">
+                <img src="/logo-igrejinha.png" alt="Logo da Igrejinha" className="hero-logo" />
+              </div>
+              <div className="hero-logo-meta">
+                <span className="hero-chip">Servidor oficial</span>
+                <h2>Igrejinha</h2>
+                <p>Visual com identidade própria, fundo inspirado em arte de cidade praiana no estilo GTA.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </header>
+
+      <main className="container main-grid" id="regras">
+        <aside className="sidebar">
+          <div className="panel">
+            <div className="panel-header">
+              <Search size={18} />
+              <h2>Buscar nas regras</h2>
+            </div>
+            <input
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+              placeholder="Ex.: metagaming, assalto, polícia..."
+              className="search-input"
+            />
+            <div className="tag-list">
+              {highlights.map((tag) => (
+                <span key={tag} className="tag">
+                  {tag}
+                </span>
+              ))}
+            </div>
+          </div>
+
+          <div className="panel">
+            <div className="panel-header">
+              <ChevronRight size={18} />
+              <h2>Navegação</h2>
+            </div>
+            <nav className="nav-list">
+              {sections.map((section) => {
+                const Icon = section.icon
+                return (
+                  <a key={section.id} href={`#${section.id}`} className="nav-link">
+                    <Icon size={16} />
+                    <span>{section.title}</span>
+                  </a>
+                )
+              })}
+            </nav>
+          </div>
+        </aside>
+
+        <section className="content-area">
+          <div className="top-cards">
+            <div className="stat-card">
+              <p>Princípio central</p>
+              <h3>Imersão</h3>
+              <span>Jogue pensando na história do seu personagem e no peso das suas decisões.</span>
+            </div>
+            <div className="stat-card">
+              <p>Postura esperada</p>
+              <h3>Respeito</h3>
+              <span>Sem caos gratuito. A experiência coletiva vem antes da vontade individual.</span>
+            </div>
+            <div className="stat-card">
+              <p>Canal oficial</p>
+              <h3>Discord</h3>
+              <span>Use o Discord da cidade para atualizações, denúncias e comunicação com a staff.</span>
+            </div>
+          </div>
+
+          {filteredSections.map((section) => {
+            const Icon = section.icon
+            return (
+              <article key={section.id} id={section.id} className="section-card">
+                <div className="section-header">
+                  <div className="section-icon">
+                    <Icon size={20} />
+                  </div>
+                  <div>
+                    <h2>{section.title}</h2>
+                    <p>{section.accent}</p>
+                  </div>
+                </div>
+                <div className="rule-list">
+                  {section.items.map((item) => (
+                    <div className="rule-item" key={item.title}>
+                      <h3>{item.title}</h3>
+                      <p>{item.text}</p>
+                    </div>
+                  ))}
+                </div>
+              </article>
+            )
+          })}
+
+          {filteredSections.length === 0 && (
+            <div className="empty-state">
+              <h3>Nenhuma regra encontrada</h3>
+              <p>Tente pesquisar com outro termo.</p>
+            </div>
+          )}
+
+          <div className="final-note">
+            <div className="final-note-icon">
+              <Building2 size={24} />
+            </div>
+            <div>
+              <h2>Observação final da staff</h2>
+              <p>
+                Estas regras podem ser atualizadas a qualquer momento para manter a organização da
+                cidade. Cabe ao jogador acompanhar anúncios oficiais, mudanças de sistema e orientações
+                publicadas no Discord da comunidade. O desconhecimento das regras não será aceito como
+                justificativa para infrações.
+              </p>
+            </div>
+          </div>
+        </section>
+      </main>
+    </div>
+  )
+}
